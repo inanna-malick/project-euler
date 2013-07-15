@@ -1,3 +1,5 @@
+package other
+
 object MapFilter {
 
   def main(args: Array[String]): Unit = {
