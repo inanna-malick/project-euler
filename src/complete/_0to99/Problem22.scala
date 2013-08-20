@@ -1,4 +1,6 @@
-package complete
+package complete._0to99
+
+import scala.Array.canBuildFrom
 
 /*
 Using names.txt (right click and 'Save Link/Target As...'), a 46K text file containing over five-thousand first names, 

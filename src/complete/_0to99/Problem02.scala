@@ -1,4 +1,4 @@
-package complete
+package complete._0to99
 
 object Problem2 {
 

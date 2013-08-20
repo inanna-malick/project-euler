@@ -1,4 +1,4 @@
-package complete
+package complete._0to99
 
 object Problem1 {
 	//sum of all the multiples of 3 or 5 below 1000.

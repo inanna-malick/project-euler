@@ -4,7 +4,7 @@ Starting in the top left corner of a 22 grid, and only being able to move to the
 How many such routes are there through a 2020 grid?
  */
 
-package complete
+package complete._0to99
 
 object Problem15 {
 

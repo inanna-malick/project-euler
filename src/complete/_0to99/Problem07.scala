@@ -10,11 +10,12 @@ object Problem7 {
 		@scala.annotation.tailrec
 		def loop(i: Int, primes_found: Seq[Int]): Seq[Int] = {
 			if (primes_found.length >= until) 
-				primes_found
+				primes_found //done, return all primes found so far
 			else {
 				if (primes_found exists (x => i % x == 0)) 
 					loop(i + 2, primes_found) // a prime exists that evenly divides this, continue
-				else loop(i + 2, primes_found :+ i)	// a new prime is found
+				else 
+					loop(i + 2, primes_found :+ i)	// a new prime is found, add and continue
 			}
 		}
 		if (until <= 1) Seq(2)
