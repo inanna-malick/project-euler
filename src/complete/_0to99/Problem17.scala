@@ -17,56 +17,69 @@ The use of "and" when writing out numbers is in compliance with British usage.
 
 
 class Parser extends RegexParsers {
-	val ones = Map("0" -> "zero", "1" -> "one", 
-						 "2" -> "two", "3" -> "three", 
-						 "4" -> "four", "5" -> "five", 
-						 "6" -> "six", "7" -> "seven", 
-						 "8" -> "eight", "9" -> "nine")
-						 
-	val tens = Map("2" -> "twenty", "3" -> "thirty", 
-						 "4" -> "forty", "5" -> "fifty", 
-						 "6" -> "sixty", "7" -> "seventy", 
-						 "8" -> "eighty", "9" -> "ninety")
-						 
-	val teens = Map("10" -> "ten", "11" -> "eleven", 
-						 "12" -> "twelve", "13" -> "thirteen", 
-						 "14" -> "fourteen", "15" -> "fifteen", 
-						 "16" -> "sixteen", "17" -> "seventeen",
-						 "18" -> "eighteen", "19" -> "nineteen")
-						 
-	def one: Parser[String] = """\d""".r ^^ { ones(_) }
-	
-	def ten: Parser[String] = """\d""".r ^^ { tens(_)}
-	
-	def hundred: Parser[String] = """\d""".r ^^ { ones(_) + " hundred and "}
+	val ones = Map("0" -> "", "1" -> "one",
+		"2" -> "two", "3" -> "three",
+		"4" -> "four", "5" -> "five",
+		"6" -> "six", "7" -> "seven",
+		"8" -> "eight", "9" -> "nine")
 
-	def thousand: Parser[String] = """\d""".r ^^ { ones(_) + " thousand "}
+	val tens = Map("0" -> "",
+		"2" -> "twenty", "3" -> "thirty",
+		"4" -> "forty", "5" -> "fifty",
+		"6" -> "sixty", "7" -> "seventy",
+		"8" -> "eighty", "9" -> "ninety")
+
+	val teens = Map("10" -> "ten", "11" -> "eleven",
+		"12" -> "twelve", "13" -> "thirteen",
+		"14" -> "fourteen", "15" -> "fifteen",
+		"16" -> "sixteen", "17" -> "seventeen",
+		"18" -> "eighteen", "19" -> "nineteen")
+						 
+	def one: Parser[String] = """\d""".r ^^ {ones(_)}
 	
-	def teen: Parser[String] = """1\d""".r ^^ { teens(_)}
+	def ten: Parser[String] = """[02-9]""".r ^^ {tens(_)}
 	
+	def hundred: Parser[String] = """\d""".r ^^ {ones(_)}
+
+	def thousand: Parser[String] = """\d""".r ^^ {ones(_)}
 	
-	//What type is this?!!!!!!!!!
-	def number = thousand ~ hundred ~ (teen | (ten ~ one))
+	def teen: Parser[String] = """1[0-9]""".r ^^ {teens(_)}
+	
+	def _1:Parser[String] = one
+	def _2a: Parser[String] = (ten ~ one) ^^ {case a ~ "" => a
+											  case "" ~ b => b
+											  case a ~ b => a + " " + b}
+	
+	def _2: Parser[String] = teen | _2a
+	
+	def _3: Parser[String] = (hundred ~ _2) ^^ {case "" ~ b => b
+												case a ~ "" => a + " hundred"
+												case a ~ b => a + " hundred and " + b}
+	
+	def _4: Parser[String] = (thousand ~ _3) ^^ {case "" ~ b => b
+												case a ~ "" => a + " thousand"
+												 case a ~ b => a + " thousand and " + b}
+	
+	def number: Parser[String] = _4 | _3 | _2 | _1
 }
 
 object Problem17 extends Parser {
 	
-	
-
-	def main(args: Array[String]): Unit = {
-		
-		val s = "1112"
-		
-		//we need to wrap the string in a reader so our parser can digest it
+	def parse(s: String): Int = {
+		//wrap the string in a reader so our parser can digest it
 		val input = new CharSequenceReader(s)
 		val result = number(input) match {
 			case Success(t, _) => println(t); t
 			case NoSuccess(msg, _) => throw new IllegalArgumentException(
 				"Could not parse '" + s + "': " + msg)
 		}
-		
-		
-		
+		result.count(('a' to 'z').contains(_))
+	}
+	
+	//is it inefficient and unnecessary to parse string representations 
+	//of numbers into the full British form using parsers? You betcha. 
+	def main(args: Array[String]): Unit = {
+		assert((1 to 1000).map(n => parse(n.toString)).sum == 21124)		
 	}
 
 	
